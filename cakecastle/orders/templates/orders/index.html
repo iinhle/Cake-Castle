@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CAKE CASTLE</title>
+</head>
+<body>
+    <h1>Welcome to CAKE CASTLE</h1>
+    <ul>
+        {% for cake in cakes %}
+            <li>{{ cake.name }} - {{ cake.flavor }} - {{ cake.size }} - ${{ cake.price }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
