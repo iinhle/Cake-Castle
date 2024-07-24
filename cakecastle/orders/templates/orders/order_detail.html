@@ -2,14 +2,17 @@
 <html>
 <head>
     <title>Order Detail</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Order Detail</h1>
-    <p>Customer Name: {{ order.customer_name }}</p>
-    <p>Customer Email: {{ order.customer_email }}</p>
-    <p>Cake: {{ order.cake.name }}</p>
-    <p>Quantity: {{ order.quantity }}</p>
-    <p>Ordered At: {{ order.ordered_at }}</p>
+    <div class="container">
+        <h1 class="text-center my-4">Order Detail</h1>
+        <p>Customer Name: {{ order.customer_name }}</p>
+        <p>Customer Email: {{ order.customer_email }}</p>
+        <p>Cake: {{ order.cake.name }}</p>
+        <p>Quantity: {{ order.quantity }}</p>
+        <p>Ordered At: {{ order.ordered_at }}</p>
+    </div>
 </body>
 </html>
-

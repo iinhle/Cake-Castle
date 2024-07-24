@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Post</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'orders/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Create a New Post</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-coral btn-block">Submit Post</button>
+        </form>
+        <a href="{% url 'index' %}" class="btn btn-link mt-3">Back to Home</a>
+    </div>
+</body>
+</html>

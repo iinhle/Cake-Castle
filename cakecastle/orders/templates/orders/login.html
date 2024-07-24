@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'orders/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Login</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-coral btn-block">Login</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="{% url 'signup' %}" class="btn btn-link">Sign Up</a> |
+            <a href="{% url 'index' %}" class="btn btn-link">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
