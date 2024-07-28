@@ -13,6 +13,9 @@
             {% for order in orders %}
                 <li class="list-group-item">
                     <a href="{% url 'order_detail' order.id %}">Order #{{ order.id }}</a> by {{ order.customer_name }}
+                    <div class="float-right">
+                        <a href="{% url 'track_order' order.id %}" class="btn btn-sm btn-info">Track Order</a>
+                    </div>
                 </li>
             {% endfor %}
         </ul>

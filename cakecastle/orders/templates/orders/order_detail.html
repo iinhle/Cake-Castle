@@ -13,6 +13,30 @@
         <p>Cake: {{ order.cake.name }}</p>
         <p>Quantity: {{ order.quantity }}</p>
         <p>Ordered At: {{ order.ordered_at }}</p>
+        <p>Order Status: {{ order.status }}</p>
+
+        <h2 class="my-4">Reviews</h2>
+        <ul class="list-group">
+            {% for review in order.cake.review_set.all %}
+                <li class="list-group-item">
+                    <strong>{{ review.user.username }}:</strong> {{ review.comment }}
+                    <span class="float-right">{{ review.rating }} stars</span>
+                </li>
+            {% endfor %}
+        </ul>
+        
+        {% if user.is_authenticated %}
+            <h3 class="my-4">Add a Review</h3>
+            <form method="post" action="{% url 'add_review' order.cake.id %}">
+                {% csrf_token %}
+                {{ review_form.as_p }}
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        {% else %}
+            <p>Please <a href="{% url 'login' %}">login</a> to add a review.</p>
+        {% endif %}
+        
+        <a href="{% url 'order_list' %}" class="btn btn-link mt-3">Back to Order List</a>
     </div>
 </body>
 </html>

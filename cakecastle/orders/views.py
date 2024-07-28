@@ -2,30 +2,35 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Cake, Order, Post
-from .forms import OrderForm, SignUpForm, PostForm
+from django.db.models import Avg
+from .models import Cake, Order, Post, Review
+from .forms import OrderForm, SignUpForm, PostForm, ReviewForm
 
 def index(request):
     cakes = Cake.objects.all()
     posts = Post.objects.all()
     return render(request, 'orders/index.html', {'cakes': cakes, 'posts': posts})
 
+@login_required
 def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order_detail.html', {'order': order})
 
 def create_order(request):
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
-            form.save()
+            order = form.save(commit=False)
+            order.user = request.user
+            order.save()
             return redirect('order_list')
     else:
         form = OrderForm()
     return render(request, 'orders/create_order.html', {'form': form})
 
+@login_required
 def order_list(request):
-    orders = Order.objects.all()
+    orders = Order.objects.filter(user=request.user)
     return render(request, 'orders/order_list.html', {'orders': orders})
 
 def signup_view(request):
@@ -67,11 +72,6 @@ def create_post(request):
         form = PostForm()
     return render(request, 'orders/create_post.html', {'form': form})
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Cake, Review
-from .forms import ReviewForm
-
 @login_required
 def submit_review(request, cake_id):
     cake = get_object_or_404(Cake, id=cake_id)
@@ -86,9 +86,6 @@ def submit_review(request, cake_id):
     else:
         form = ReviewForm()
     return render(request, 'orders/submit_review.html', {'form': form, 'cake': cake})
-
-from django.db.models import Avg
-from .models import Cake, Review
 
 def cake_detail(request, cake_id):
     cake = get_object_or_404(Cake, id=cake_id)
