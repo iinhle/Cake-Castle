@@ -11,4 +11,13 @@ urlpatterns = [
     path('create_post/', views.create_post, name='create_post'),
 ]
 
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Other URLs...
+    path('order/<int:order_id>/checkout/', views.create_checkout_session, name='create_checkout_session'),
+    path('success/', views.success, name='success'),
+    path('cancel/', views.cancel, name='cancel'),
+]
 

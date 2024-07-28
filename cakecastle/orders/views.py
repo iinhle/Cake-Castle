@@ -92,3 +92,45 @@ def cake_detail(request, cake_id):
     reviews = cake.reviews.all()
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
     return render(request, 'orders/cake_detail.html', {'cake': cake, 'reviews': reviews, 'avg_rating': avg_rating})
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+def update_order_status(order, status):
+    order.status = status
+    order.save()
+    send_mail(
+        'Order Status Update',
+        f'Your order for {order.cake.name} is now {order.get_status_display()}.',
+        settings.EMAIL_HOST_USER,
+        [order.user.email],
+        fail_silently=False,
+    )
+
+import stripe
+from django.conf import settings
+from django.shortcuts import render, redirect
+from .models import Order
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@login_required
+def create_checkout_session(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+                    'name': order.cake.name,
+                },
+                'unit_amount': int(order.cake.price * 100),
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=request.build_absolute_uri('/success/'),
+        cancel_url=request.build_absolute_uri('/cancel/'),
+    )
+    return redirect(session.url, code=303)
