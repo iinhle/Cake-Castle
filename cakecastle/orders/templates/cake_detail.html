@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ cake.name }}</title>
+</head>
+<body>
+    <h1>{{ cake.name }}</h1>
+    <p>Flavor: {{ cake.flavor }}</p>
+    <p>Size: {{ cake.size }}</p>
+    <p>Price: ${{ cake.price }}</p>
+    <p>Average Rating: {{ avg_rating|default:"No ratings yet" }}</p>
+    <h2>Reviews</h2>
+    <ul>
+        {% for review in reviews %}
+            <li>{{ review.user.username }} - {{ review.rating }} stars - {{ review.comment }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'submit_review' cake.id %}">Leave a Review</a>
+    <a href="{% url 'index' %}">Back to Home</a>
+</body>
+</html>
