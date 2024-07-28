@@ -66,3 +66,23 @@ def create_post(request):
     else:
         form = PostForm()
     return render(request, 'orders/create_post.html', {'form': form})
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Cake, Review
+from .forms import ReviewForm
+
+@login_required
+def submit_review(request, cake_id):
+    cake = get_object_or_404(Cake, id=cake_id)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.cake = cake
+            review.user = request.user
+            review.save()
+            return redirect('cake_detail', cake_id=cake.id)
+    else:
+        form = ReviewForm()
+    return render(request, 'orders/submit_review.html', {'form': form, 'cake': cake})

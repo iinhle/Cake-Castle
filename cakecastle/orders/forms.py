@@ -20,3 +20,10 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'description', 'image', 'cake']
 
+from django import forms
+from .models import Review
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
