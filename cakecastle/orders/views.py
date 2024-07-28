@@ -86,3 +86,12 @@ def submit_review(request, cake_id):
     else:
         form = ReviewForm()
     return render(request, 'orders/submit_review.html', {'form': form, 'cake': cake})
+
+from django.db.models import Avg
+from .models import Cake, Review
+
+def cake_detail(request, cake_id):
+    cake = get_object_or_404(Cake, id=cake_id)
+    reviews = cake.reviews.all()
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+    return render(request, 'orders/cake_detail.html', {'cake': cake, 'reviews': reviews, 'avg_rating': avg_rating})

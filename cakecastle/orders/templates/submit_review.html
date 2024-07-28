@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Review</title>
+</head>
+<body>
+    <h1>Submit Review for {{ cake.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    <a href="{% url 'cake_detail' cake.id %}">Back to Cake</a>
+</body>
+</html>
