@@ -36,13 +36,6 @@ class Post(models.Model):
 from django.db import models
 from django.contrib.auth.models import User
 
-class Cake(models.Model):
-    name = models.CharField(max_length=200)
-    flavor = models.CharField(max_length=100)
-    size = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=5, decimal_places=2)
-    # Other fields...
-
 class Review(models.Model):
     cake = models.ForeignKey(Cake, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
