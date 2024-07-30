@@ -134,3 +134,90 @@ def create_checkout_session(request, order_id):
         cancel_url=request.build_absolute_uri('/cancel/'),
     )
     return redirect(session.url, code=303)
+
+import paypalrestsdk
+from django.conf import settings
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Order
+
+# Configure PayPal SDK
+paypalrestsdk.configure({
+    "mode": settings.PAYPAL_MODE,  # sandbox or live
+    "client_id": settings.PAYPAL_CLIENT_ID,
+    "client_secret": settings.PAYPAL_CLIENT_SECRET,
+})
+
+@login_required
+def create_paypal_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+            "return_url": request.build_absolute_uri('/paypal-success/'),
+            "cancel_url": request.build_absolute_uri('/paypal-cancel/')
+        },
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": order.cake.name,
+                    "sku": str(order.id),  # Ensure sku matches order.id for success view
+                    "price": str(order.cake.price),
+                    "currency": "USD",
+                    "quantity": 1
+                }]
+            },
+            "amount": {
+                "total": str(order.cake.price),
+                "currency": "USD"
+            },
+            "description": f"Order for {order.cake.name}"
+        }]
+    })
+
+    if payment.create():
+        for link in payment.links:
+            if link.rel == "approval_url":
+                approval_url = link.href
+                return redirect(approval_url)
+    else:
+        return render(request, 'orders/payment_error.html', {'error': payment.error})
+
+@login_required
+def paypal_success(request):
+    payment_id = request.GET.get('paymentId')
+    payer_id = request.GET.get('PayerID')
+    payment = paypalrestsdk.Payment.find(payment_id)
+
+    if payment.execute({"payer_id": payer_id}):
+        # Update order status to "Paid" or equivalent
+        order = get_object_or_404(Order, id=payment.transactions[0].item_list.items[0].sku)
+        order.status = 'Paid'
+        order.save()
+        return render(request, 'orders/payment_success.html')
+    else:
+        return render(request, 'orders/payment_error.html', {'error': payment.error})
+
+@login_required
+def paypal_cancel(request):
+    return render(request, 'orders/payment_cancel.html')
+
+def success(request):
+    return render(request, 'orders/success.html')
+
+def cancel(request):
+    return render(request, 'orders/cancel.html')
+
+from django.shortcuts import render
+
+def track_order(request):
+    return render(request, 'orders/track_order.html')
+
+from django.shortcuts import render, get_object_or_404
+from .models import Order
+
+def track_order(request, id):
+    order = get_object_or_404(Order, id=id)
+    return render(request, 'orders/track_order.html', {'order': order})
